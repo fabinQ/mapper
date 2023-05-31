@@ -9,7 +9,7 @@ def scantree(path):
             yield i
 
 
-# path = "C:\\Users\\Maciej\\OneDrive - 3D GEOSYSTEMY MICHAŁ JAŚKIEWICZ\\Projekty iCON Office\\MROZOWSKI\\OBWODNICA KRAKOWA\\PODFOLDERY\\15.03.2023"
+
 path = input("Podaj ścieżke mordo ")
 print(path)
 extension_lin = '.lin'
