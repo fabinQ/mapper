@@ -8,7 +8,7 @@ class customer:
         self.customer_identify()
 
     def customer_identify(self):
-        print("Name and surname: {} {}".format(self.name,self.surname))
+        print("Name & surname: {} {}".format(self.name,self.surname))
         print("Company and position: {} {}".format(self.company, self.position))
         print("email: {}".format(self.mail))
         print()
