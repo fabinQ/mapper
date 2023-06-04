@@ -11,5 +11,7 @@ class customer:
         print("Name and surname: {} {}".format(self.name,self.surname))
         print("Company and position: {} {}".format(self.company, self.position))
         print("email: {}".format(self.mail))
+        print()
 
 customer_1 = customer("ComaneX sp. z.o.o", "Grzegorz", "Brzęczyszczykiewicz", "Specialist", "grzeg.brzencz@gmail.com")
+customer_2 = customer("ComanDEX sp. z.o.o", "Jan", "Wiśnia", "CEO", "jan.cherry@gmail.com")
