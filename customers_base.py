@@ -13,5 +13,6 @@ class customer:
         print("email: {}".format(self.mail))
         print()
 
-customer_1 = customer("ComaneX sp. z.o.o", "Grzegorz", "Brzęczyszczykiewicz", "Specialist", "grzeg.brzencz@gmail.com")
-customer_2 = customer("ComanDEX sp. z.o.o", "Jan", "Wiśnia", "CEO", "jan.cherry@gmail.com")
+customer_1 = customer("CompaneX sp. z.o.o", "Grzegorz", "Brzęczyszczykiewicz", "Specialist", "grzeg.brzencz@gmail.com")
+customer_2 = customer("CompanDEX sp. z.o.o", "Jan", "Wiśnia", "CEO", "jan.cherry@gmail.com")
+customer_3 = customer("CoDEX sp. z.o.o", "Jose", "Kowalsky", "junior", "jose.kowalsky@gmail.com")
