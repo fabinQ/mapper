@@ -29,13 +29,16 @@ def positon(path):
 
             #jeśli znajdzie dopasowanie to doda pozycje do listy poz
             if match != None:
-                print (match.group())
+                print(match.group())
                 poz.append(i)  # dodanie pozycji linii do listy pozycji
-                print(f"Numer  linii: {match.group(1)}, Linia: {i}")
+                print(f"Numer  linii: {match.group(1)}, Linia: {i}") # group zwraca z paternu kolejne nazwy
                 id_line.append(match.group(1))  # dodanie identyfikatora linii do listy identyfikatorów
+
+            # znajdowanie koloru
             if match_color != None:
                 # print(f"Kolor  linii: {match_color.group(1)} Linia: {i}")
                 id_color.append(match_color.group(1))
+
         poz.append(num_lines-1)  # dodanie końcowej pozycji pliku do listy pozycji
     return poz, id_line, id_color
 
