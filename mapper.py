@@ -4,28 +4,34 @@ import numpy as np
 from datetime import datetime
 datetime_start = datetime.now()
 
+
+# ścieżka do pliku .geo
 path = os.getcwd()
 plik = "Krawedzie3.geo"
 # plik = "Krawędzie S7 -13 odl śred 0.05m min dlug linii 30m min rozm trójk 50m.geo"
 path = os.path.join(path, plik)
 
 
-
 # funkcja zwracająca pozycje linii, ich identyfikatory oraz kolory
 def positon(path):
     with open(path, 'r') as f:
         lines = f.readlines()    # odczytanie wszystkich linii pliku
-        num_lines = len(lines)
-        poz = []
+        print(lines)
+        num_lines = len(lines)  # ilość linii
+        poz = []    #pozycja
         id_line = []
         id_color = []
+
+# przenumeruje linie zwraca numer linii oraz linie
         for i, line in enumerate(lines, start=1):
-            # print(i,line)
-            match = re.search(r'Line "(\w+|\d+|\w+\d+\.\d+|\d+\.\d+\w+)"', line)  # wyszukanie identyfikatora linii
+            match = re.search(r'Line\s*"([^"]+)",,', line)  # wyszukanie identyfikatora linii
             match_color = re.search(r'Attribute "COLOR","(\d+)"', line)  # wyszukanie koloru linii
+
+            #jeśli znajdzie dopasowanie to doda pozycje do listy poz
             if match != None:
+                print (match.group())
                 poz.append(i)  # dodanie pozycji linii do listy pozycji
-                # print(f"Numer  linii: {match.group(1)}, Linia: {i}")
+                print(f"Numer  linii: {match.group(1)}, Linia: {i}")
                 id_line.append(match.group(1))  # dodanie identyfikatora linii do listy identyfikatorów
             if match_color != None:
                 # print(f"Kolor  linii: {match_color.group(1)} Linia: {i}")
@@ -79,7 +85,7 @@ def points_id(data_float):
     lp = []
     for i in data_float:
         lp.append(list(range(0,len(i))))
-        print('Uwaga len data float {}, lp {}'.format(len(i),list(range(0,len(i)))))
+        # print('Uwaga len data float {}, lp {}'.format(len(i),list(range(0,len(i)))))
     data_id = [list(zip(sublist1, sublist2)) for sublist1, sublist2 in zip(lp, data_float)]
     for i in data_id:
         print(i)
@@ -193,16 +199,16 @@ def median_mean(*args):
 
 
 poz, id_line, id_color = positon(path)
-poz_real = position_real(poz)
-data_float = points_finder(path, poz_real)
-# printuj(id_line, id_color, data_float)
-data_id = points_id(data_float)
-tab_of_azimuth = azimuth(data_id)
-# printuj_2(tab_of_azimuth)
-data_id = points_id(tab_of_azimuth)
-print(data_id)
-# printuj_2(data_id)
-median_mean(tab_of_azimuth)
+# poz_real = position_real(poz)
+# data_float = points_finder(path, poz_real)
+# # printuj(id_line, id_color, data_float)
+# data_id = points_id(data_float)
+# tab_of_azimuth = azimuth(data_id)
+# # printuj_2(tab_of_azimuth)
+# data_id = points_id(tab_of_azimuth)
+# print(data_id)
+# # printuj_2(data_id)
+# median_mean(tab_of_azimuth)
 
 datetime_stop = datetime.now()
 print("Czas wykonania to {} sekund.".format(datetime_stop-datetime_start))
