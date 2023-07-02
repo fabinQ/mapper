@@ -16,30 +16,29 @@ path = os.path.join(path, plik)
 def positon(path):
     with open(path, 'r') as f:
         lines = f.readlines()    # odczytanie wszystkich linii pliku
-        print(lines)
         num_lines = len(lines)  # ilość linii
         poz = []    #pozycja
         id_line = []
         id_color = []
 
 # przenumeruje linie zwraca numer linii oraz linie
-        for i, line in enumerate(lines, start=1):
-            match = re.search(r'Line\s*"([^"]+)",,', line)  # wyszukanie identyfikatora linii
-            match_color = re.search(r'Attribute "COLOR","(\d+)"', line)  # wyszukanie koloru linii
+    for i, line in enumerate(lines, start=1):
+        match = re.search(r'Line\s*"([^"]+)",,', line)  # wyszukanie identyfikatora linii
+        match_color = re.search(r'Attribute "COLOR","(\d+)"', line)  # wyszukanie koloru linii
 
-            #jeśli znajdzie dopasowanie to doda pozycje do listy poz
-            if match != None:
-                print(match.group())
-                poz.append(i)  # dodanie pozycji linii do listy pozycji
-                print(f"Numer  linii: {match.group(1)}, Linia: {i}") # group zwraca z paternu kolejne nazwy
-                id_line.append(match.group(1))  # dodanie identyfikatora linii do listy identyfikatorów
+        #jeśli znajdzie dopasowanie to doda pozycje do listy poz
+        if match != None:
+            poz.append(i)  # dodanie pozycji linii do listy pozycji
+            print(f"Numer  linii: {match.group(1)}, Linia: {i}") # group zwraca z paternu kolejne nazwy
+            id_line.append(match.group(1))  # dodanie identyfikatora linii do listy identyfikatorów
 
-            # znajdowanie koloru
-            if match_color != None:
-                # print(f"Kolor  linii: {match_color.group(1)} Linia: {i}")
-                id_color.append(match_color.group(1))
+        # znajdowanie koloru
+        if match_color != None:
+            # print(f"Kolor  linii: {match_color.group(1)} Linia: {i}")
+            id_color.append(match_color.group(1))
 
-        poz.append(num_lines-1)  # dodanie końcowej pozycji pliku do listy pozycji
+    poz.append(num_lines-1)  # dodanie końcowej pozycji pliku do listy pozycji
+    position_real(poz)
     return poz, id_line, id_color
 
 
@@ -202,8 +201,7 @@ def median_mean(*args):
 
 
 poz, id_line, id_color = positon(path)
-# poz_real = position_real(poz)
-# data_float = points_finder(path, poz_real)
+data_float = points_finder(path, poz)
 # # printuj(id_line, id_color, data_float)
 # data_id = points_id(data_float)
 # tab_of_azimuth = azimuth(data_id)
