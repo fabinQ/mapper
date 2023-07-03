@@ -11,6 +11,13 @@ plik = "Krawedzie3.geo"
 # plik = "Krawędzie S7 -13 odl śred 0.05m min dlug linii 30m min rozm trójk 50m.geo"
 path = os.path.join(path, plik)
 
+def open_function(func):
+    def a_wrapped_function(path):
+        with open(path, 'r') as f:
+            lines = f.readlines()
+        func(path)
+        return lines
+    return a_wrapped_function
 
 # funkcja zwracająca pozycje linii, ich identyfikatory oraz kolory
 def positon(path):
