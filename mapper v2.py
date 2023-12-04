@@ -1,14 +1,16 @@
 import os
 
-file = 'Krawedzie3.geo'
-with open(file_path, 'r') as f:
-    lines = f.readlines()
+#definicja pliku
+file = 'krawedzie.geo'
 
-    for line in f:
+#Otwarcie pliku
+file = open(file,'r')
 
+#Generator linii
 def file_line_generator(file):
-
-            yield line
+    for line in file:
+        line = line.strip()
+        yield line
 
 for line in file_line_generator(file):
     print(line)
