@@ -1,20 +1,31 @@
 import os
 
-#definicja pliku
-file = 'krawedzie.geo'
-
-#Otwarcie pliku
-file = open(file,'r')
-
-#Generator linii
-def file_line_generator(file):
-    for line in file:
-        line = line.strip()
-        yield line
-
-for line in file_line_generator(file):
-    print(line)
 class File:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.file_handle = None
+    def __next__(self):
+        if self.file_handle is None:
+            self.file_handle = open(self.file_path, 'r')
+
+        line = next(self.file_handle, None)
+        if line is None:
+            # Zamknij plik, gdy osiągniemy koniec
+            self.file_handle.close()
+            raise StopIteration
+        return line.rstrip()
+
+    def __iter__(self):
+        return self
+
+file = File('krawedzie.geo')
+
+
+
+for line in file:
+    print(line)
+
+class File_line(File):
     def __init__(self, header, info_list):
         self.header = header
         self.info_list = info_list
