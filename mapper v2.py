@@ -7,7 +7,7 @@ class File:
     def __init__(self, file_path):
         self.file_path = open(file_path, 'r')
         self.file_info = self.header()
-        print(sys.getsizeof(self.file_info))
+        
     def __next__(self):
         return next(self.file_path).strip()
 
@@ -19,15 +19,21 @@ class File:
 
     def header(self):
         file_info = []
-        header_line = next(self.file_path).split('"')[1::2]
-        file_info.append(tuple(header_line))
+        header_line = tuple(next(self.file_path).split('"')[1::2])
+        file_info.append({'Header': header_line})
         next(self.file_path)
-        while header_line:
+        while header_line != 'end':
             header_line = next(self.file_path).split('"')[1::2]
-            file_info.append(tuple(header_line))
-        file_info.pop()
+            if not header_line: break
+            key = header_line[0]
+            value = header_line[1] if len(header_line) > 1 else None
+            file_info.append({key: value})
+
         print(file_info)
         return file_info
+
+    def json_file(self):
+        pass
 
 
 file = File('krawedzie.geo')
