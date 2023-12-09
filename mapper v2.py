@@ -33,7 +33,7 @@ class File:
         return file_info
 
     def json_file(self):
-        file_name = os.path.join('./json/',self.formatted_datatime + ' ' + self.file_info.get('Company'))
+        file_name = os.path.join('./json/',self.formatted_datatime + ' ' + self.file_info.get('Company')+'.json')
         print(file_name)
         with open(file_name, 'w') as json_file:
             json.dump(self.file_info,json_file, indent=2)
