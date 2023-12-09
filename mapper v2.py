@@ -42,6 +42,11 @@ class File:
         return datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S")
 
 
+class Line(File):
+    def __init__(self):
+        pass
+
+
 # file = File('krawedzie.geo')
 # file = File('GRZ-25511-27300.geo')
 # file = File('1.geo')
