@@ -26,6 +26,8 @@ class File:
         next(self.file_path)
         header_line = next(self.file_path).split('"')[1::2]
         while header_line:
+            # while header_line is None:
+            #     break
             key = header_line[0]
             value = header_line[1] if len(header_line) > 1 else None
             file_info.update({key: value})
@@ -58,4 +60,6 @@ file = File('Chorzew_T5_spód_tłucznia.geo')
 # print(str(file))
 
 for line in file:
-    print(line)
+    # if line =='LineList':
+     print(line)
+
