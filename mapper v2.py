@@ -52,9 +52,9 @@ class Line(File):
         pass
 
 
-# file = File('krawedzie.geo')
+file = File('krawedzie.geo')
 # file = File('GRZ-25511-27300.geo')
-file = File('krawedzie3.geo')
+# file = File('krawedzie3.geo')
 # file = File('1.geo')
 # file = File('Chorzew_T5_spód_tłucznia.geo')
 # file = File('Chorzew_T5_spód_tłucznia v2.geo')
@@ -64,34 +64,26 @@ file = File('krawedzie3.geo')
 # print(str(file))
 
 
-def generate_line_names_points(pattern):
-    line_points = []
-    for line in file:
-        print(line)
-        if line_point_pattern.match(line):
-            print(line_point_pattern.match(line))
-            line_points.append(line_point_pattern.match(line))
-        elif line == '\tend':
-            return line_points
+def generate_line_names_points():
+    line_point = []
+    for _ in file:
+        print(_)
+        if line_point_pattern.match(_):
+            print(line_point_pattern.match(_))
+            line_point.append(line_point_pattern.match(_).groupdict())
+        elif _ == '\tend':
+            return line_point
 
 
-line_pattern = re.compile(r'\tLine "(.+?)"(?:,(\d+|),)?,(.+)?')
-line_point_pattern = re.compile(r'\t\t\tPoint "(?P<Number>\d+)",(?P<X>\d+\.\d+),(?P<Y>\d+\.\d+)(?:,(?P<Z>\d+\.\d+))?(?:,"(?P<Code>.*?)",,)?')
+line_pattern = re.compile(r'\tLine (".+"?)?(?:,(\d+|),)?,(.+)?')
+line_point_pattern = re.compile(r'\t\t\tPoint(?: (?P<Number>".+"|))?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
+                                r'(?P<Z>\d+\.\d+|-\d+\.\d+|\d+)?(?:,"(?P<Code>.*?)")?,?')
 
 for line in file:
-    line_points =[]
+    line_points = []
     print(line)
     if line_pattern.match(line):
         print(line_pattern.match(line)[1])
-        line_points.extend(generate_line_names_points(line_point_pattern))
+        line_points.extend(generate_line_names_points())
         print(line_points)
-        break
-
-# line = None
-# while True:
-#     print(line)
-#     line = next(file)
-#     if line_point_pattern.match(line):
-#         return line_point_pattern
-
-
+        # break

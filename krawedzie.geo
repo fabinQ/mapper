@@ -12,7 +12,7 @@ LineList
 begin
 	Line "2",,
 	begin
-		PointList 
+		PointList
 		begin
 			Point "1",5479526.500734,7428591.371276,623.068577,,,
 			Point "2",5479527.022263,7428598.824142,622.94335,,,
@@ -26,7 +26,7 @@ begin
 			Point "10",5479308.546332,7428613.955904,624.258453,,,
 
 		end
-		AttributeList 
+		AttributeList
 		begin
 			Attribute "COLOR","159"
 		end
@@ -38,7 +38,7 @@ begin
 			Point ,21,20,-5.3e-01,,,
 			Point ,22,21,-6.4e-01,,,
 			Point ,23,22,4.8e-01,,,
-			Point ,24,23,5.2e-01,,,
+			Point ,24,23,,,,
 		end
 		AttributeList
 		begin
