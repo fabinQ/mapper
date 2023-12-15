@@ -18,8 +18,8 @@ class File:
         return self
 
     def __str__(self):
-        return '\n'.join(f'{key} - {value}' for item in self.file_info for key, value in item.items())
-
+        # '\n'.join(f'{key} - {value}' for item in self.file_info for key, value in item.items())
+        return self.file_path.name
     def header(self):
         file_info = {}
         header_line = tuple(next(self.file_path).split('"')[1::2])
@@ -62,28 +62,31 @@ file = File('krawedzie.geo')
 # file = File('ŚR i CH.geo')
 
 # print(str(file))
-
+assert str(file).endswith('.geo')
 
 def generate_line_names_points():
     line_point = []
     for _ in file:
-        print(_)
+        # print(_)
         if line_point_pattern.match(_):
-            print(line_point_pattern.match(_))
-            line_point.append(line_point_pattern.match(_).groupdict())
+            line_point_dic = line_point_pattern.match(_).groupdict()
+            # print(line_point_dic)
+            line_point.append(line_point_dic)
         elif _ == '\tend':
             return line_point
 
 
-line_pattern = re.compile(r'\tLine (".+"?)?(?:,(\d+|),)?,(.+)?')
+line_pattern = re.compile(r'\tLine (?P<ID_line>".+"?)?,(?:(?P<Polygon>\d+|))?,(?P<Descriptoin>.+)?')
 line_point_pattern = re.compile(r'\t\t\tPoint(?: (?P<Number>".+"|))?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
                                 r'(?P<Z>\d+\.\d+|-\d+\.\d+|\d+)?(?:,"(?P<Code>.*?)")?,?')
 
 for line in file:
     line_points = []
-    print(line)
+    # print(line)
     if line_pattern.match(line):
-        print(line_pattern.match(line)[1])
+        line_id = line_pattern.match(line).groupdict()
+        print(line_id)
         line_points.extend(generate_line_names_points())
         print(line_points)
+
         # break
