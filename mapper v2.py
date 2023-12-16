@@ -24,7 +24,7 @@ class File:
         return self.file_path.name
 
     def header(self):
-        file_info = {'file': File.__str__(self)}
+        file_info = {'File': File.__str__(self)}
         header_line = tuple(next(self.file_path).split('"')[1::2])
         file_info.update({'Header': header_line})
         next(self)
