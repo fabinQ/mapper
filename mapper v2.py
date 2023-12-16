@@ -7,9 +7,12 @@ import re
 
 class File:
     def __init__(self, file_path):
+        self.data_time_stamp = self.formatted_datatime
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
-        # self.json_file()
+        print(self.file_info)
+        self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
+        self.json_file(self.file_info, self.file_name)
 
     def __next__(self):
         return next(self.file_path).rstrip()
@@ -18,13 +21,13 @@ class File:
         return self
 
     def __str__(self):
-        # '\n'.join(f'{key} - {value}' for item in self.file_info for key, value in item.items())
         return self.file_path.name
+
     def header(self):
         file_info = {}
         header_line = tuple(next(self.file_path).split('"')[1::2])
         file_info.update({'Header': header_line})
-        next(self.file_path)
+        next(self)
         header_line = next(self.file_path).split('"')[1::2]
         while header_line:
             # while header_line is None:
@@ -35,12 +38,13 @@ class File:
             header_line = next(self.file_path).split('"')[1::2]
         return file_info
 
-    def json_file(self):
+    @staticmethod
+    def json_file(content, file_name):
         if not os.path.exists('./json'):
             os.mkdir('./json')
-        file_name = os.path.join('./json/', self.formatted_datatime + ' ' + self.file_info.get('Company') + '.json')
-        with open(file_name, "w", encoding="cp1250", errors="xmlcharrefreplace") as json_file:
-            json.dump(self.file_info, json_file, indent=2)
+        with open(file_name, "a", encoding="cp1250", errors="xmlcharrefreplace") as json_file:
+            json.dump(content, json_file, indent=2)
+            json_file.write('\n')
 
     @property
     def formatted_datatime(self):
@@ -48,8 +52,12 @@ class File:
 
 
 class Line(File):
-    def __init__(self):
-        pass
+    def __init__(self, line_id_class, line_point_class):
+        file_name = file.file_name
+        self.line_id_class = line_id_class
+        self.line_point_class = line_point_class
+        self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class})}
+        self.json_file(self.line_class, file_name)
 
 
 file = File('krawedzie.geo')
@@ -64,6 +72,7 @@ file = File('krawedzie.geo')
 # print(str(file))
 assert str(file).endswith('.geo')
 
+
 def generate_line_names_points():
     line_point = []
     for _ in file:
@@ -76,17 +85,20 @@ def generate_line_names_points():
             return line_point
 
 
-line_pattern = re.compile(r'\tLine (?P<ID_line>".+"?)?,(?:(?P<Polygon>\d+|))?,(?P<Descriptoin>.+)?')
+line_pattern = re.compile(r'\tLine (?P<ID_line>".+"?)?,(?P<Polygon>\d+|)?,(?P<Descriptoin>.+)?')
 line_point_pattern = re.compile(r'\t\t\tPoint(?: (?P<Number>".+"|))?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
                                 r'(?P<Z>\d+\.\d+|-\d+\.\d+|\d+)?(?:,"(?P<Code>.*?)")?,?')
+
+index_of_line = 0
+dic_of_line_class = {}
 
 for line in file:
     line_points = []
     # print(line)
     if line_pattern.match(line):
         line_id = line_pattern.match(line).groupdict()
-        print(line_id)
         line_points.extend(generate_line_names_points())
-        print(line_points)
-
+        dic_of_line_class.update({'Line_' + str(index_of_line): Line(line_id, line_points)})
+        index_of_line += 1
         # break
+# print(dic_of_line_class)
