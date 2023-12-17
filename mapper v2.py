@@ -10,7 +10,6 @@ class File:
         self.data_time_stamp = self.formatted_datatime
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
-        print(self.file_info)
         self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
         self.json_file(self.file_info, self.file_name)
 
@@ -42,7 +41,7 @@ class File:
     def json_file(content, file_name):
         if not os.path.exists('./json'):
             os.mkdir('./json')
-        with open(file_name, "a", encoding="cp1250", errors="xmlcharrefreplace") as json_file:
+        with open(file_name, "a", encoding="utf-8", errors="xmlcharrefreplace") as json_file:
             json.dump(content, json_file, indent=2)
             json_file.write('\n')
 
@@ -58,6 +57,9 @@ class Line(File):
         self.line_point_class = line_point_class
         self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class})}
         self.json_file(self.line_class, file_name)
+
+    def simplifyer(self):
+        pass
 
 
 file = File('krawedzie.geo')
@@ -85,20 +87,23 @@ def generate_line_names_points():
             return line_point
 
 
-line_pattern = re.compile(r'\tLine (?P<ID_line>".+"?)?,(?P<Polygon>\d+|)?,(?P<Descriptoin>.+)?')
-line_point_pattern = re.compile(r'\t\t\tPoint(?: (?P<Number>".+"|))?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
+line_pattern = re.compile(r'\tLine "(?P<ID_line>.+?)"?,(?P<Polygon>\d+|)?,(?P<Descriptoin>.+)?')
+line_point_pattern = re.compile(r'\t\t\tPoint(?: "(?P<Number>.+|)")?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
                                 r'(?P<Z>\d+\.\d+|-\d+\.\d+|\d+)?(?:,"(?P<Code>.*?)")?,?')
 
 index_of_line = 0
 dic_of_line_class = {}
 
 for line in file:
-    line_points = []
     # print(line)
     if line_pattern.match(line):
         line_id = line_pattern.match(line).groupdict()
-        line_points.extend(generate_line_names_points())
-        dic_of_line_class.update({'Line_' + str(index_of_line): Line(line_id, line_points)})
+        line_points = generate_line_names_points()
+
+        # Tworzenie instancji klasy Line
+        line_instance = Line(line_id, line_points)
+
+        # Przypisanie instancji do słownika pod unikalnym kluczem
+        dic_of_line_class['Line_' + str(index_of_line)] = line_instance
         index_of_line += 1
         # break
-# print(dic_of_line_class)
