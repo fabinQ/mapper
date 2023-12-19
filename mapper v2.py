@@ -11,7 +11,7 @@ class File:
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
         self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
-        self.json_file(self.file_info, self.file_name)
+        # self.json_file(self.file_info, self.file_name)
 
     def __next__(self):
         return next(self.file_path).rstrip()
@@ -51,19 +51,21 @@ class File:
 
 
 class Line(File):
+    number_of_line = 0
     def __init__(self, line_id_class, line_point_class):
         file_name = file.file_name
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
         self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class})}
-        self.json_file(self.line_class, file_name)
+        # self.json_file(self.line_class, file_name)
+        # number_of_line +=1
 
     def simplifyer(self):
         pass
 
 
-file = File('krawedzie.geo')
-# file = File('GRZ-25511-27300.geo')
+# file = File('krawedzie.geo')
+file = File('GRZ-25511-27300.geo')
 # file = File('krawedzie3.geo')
 # file = File('1.geo')
 # file = File('Chorzew_T5_spód_tłucznia.geo')
@@ -102,8 +104,22 @@ for line in file:
 
         # Tworzenie instancji klasy Line
         line_instance = Line(line_id, line_points)
+        # print(id(line_instance))
+        # print(vars(line_instance))
 
         # Przypisanie instancji do słownika pod unikalnym kluczem
         dic_of_line_class['Line_' + str(index_of_line)] = line_instance
         index_of_line += 1
         # break
+
+
+# print(((list(dic_of_line_class.items()))[0])[1].line_point_class)
+new_line = []
+file_name  = file.file_name.rstrip('.json') + "_new_lines.json"
+# print(file_name)
+for i in dic_of_line_class.values():
+    i= i.line_class
+    # print(i['Line']['Info'])
+    new_line = i['Line']['PointList'][0::10]
+    new_line_info= {'Line': ({'Info': i['Line']['Info'], 'PointList': new_line})}
+    File.json_file(new_line_info, file_name)
