@@ -3,7 +3,7 @@ import json
 import sys
 import datetime
 import re
-import pprint
+
 
 class File:
     def __init__(self, file_path):
@@ -53,19 +53,24 @@ class File:
 class Line(File):
     number_of_line = 0
     def __init__(self, line_id_class, line_point_class):
-        file_name = file.file_name
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
-        self.line_class = {'Info': self.line_id_class, 'PointList': self.line_point_class}
+        self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class})}
         # self.json_file(self.line_class, file_name)
         # number_of_line +=1
 
-    def simplifier(self):
-        pass
+    def __str__(self):
+        return str(self.line_class)
+    @staticmethod
+    def simplifier(list_of_line_class):
+        for current_line in list_of_line_class:
+            current_point_line = current_line.line_point_class[0::2]
+            current_line.line_class.update(
+                {'Line': {'Info': current_line.line_class['Line']['Info'], 'PointList': current_point_line}})
+        return list_of_line_class
 
-
-file = File('krawedzie.geo')
-# file = File('GRZ-25511-27300.geo')
+# file = File('krawedzie.geo')
+file = File('GRZ-25511-27300.geo')
 # file = File('krawedzie3.geo')
 # file = File('1.geo')
 # file = File('Chorzew_T5_spód_tłucznia.geo')
@@ -73,11 +78,14 @@ file = File('krawedzie.geo')
 # file = File('lk zegrze.geo')
 # file = File('ŚR i CH.geo')
 
-# print(str(file))
 assert str(file).endswith('.geo')
 
 
 def generate_line_names_points():
+    '''
+    Generowanie punktów linii.
+    :return:
+    '''
     line_point = []
     for _ in file:
         if line_point_pattern.match(_):
@@ -87,35 +95,27 @@ def generate_line_names_points():
             return line_point
 
 
-# patterny do linii i punktów
 line_pattern = re.compile(r'\tLine "(?P<ID_line>.+?)"?,(?P<Polygon>\d+|)?,(?P<Descriptoin>.+)?')
 line_point_pattern = re.compile(r'\t\t\tPoint(?: "(?P<Number>.+|)")?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
                                 r'(?P<Z>\d+\.\d+|-\d+\.\d+|\d+)?(?:,"(?P<Code>.*?)")?,?')
 
-index_of_line = 0
-dic_of_line_class = []
+list_of_line_class = []
 
+# Generowanie nowych instancji linii z pliku tekstowego
 for line in file:
     if line_pattern.match(line):
         line_id = line_pattern.match(line).groupdict()
         line_points = generate_line_names_points()
-        pp = pprint.PrettyPrinter(width=41, compact=True)
 
-        #Tworzenie instancji klasy Line
+        # Tworzenie instancji klasy Line
         line_instance = Line(line_id, line_points)
 
         # Przypisanie instancji do słownika pod unikalnym kluczem
-        dic_of_line_class.append(line_instance)
-        index_of_line += 1
+        list_of_line_class.append(line_instance)
 
-lvl_of_simplifier = 2
-new_line = []
-new_line_info = []
 file_name = file.file_name.rstrip('.json') + "_new_lines.json"
 
-for i in dic_of_line_class:
-    i= i.line_class
-    new_line = i['PointList'][0::lvl_of_simplifier]
-    new_line_info.append({'Info': i['Info'], 'PointList': new_line})
-    # File.json_file(new_line_info, file_name)
-pp.pprint(new_line_info)
+list_of_line_class = Line.simplifier(list_of_line_class)
+
+for x in list_of_line_class:
+    print(x)
