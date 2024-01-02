@@ -11,7 +11,7 @@ class File:
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
         self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
-        # self.json_file(self.file_info, self.file_name)
+        self.json_file(self.file_info, self.file_name)
 
     def __next__(self):
         return next(self.file_path).rstrip()
