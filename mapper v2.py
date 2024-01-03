@@ -23,18 +23,23 @@ class File:
         return self.file_path.name
 
     def header(self):
+        # Utworzenie zmiennych składowych takich jak nazwa pliku
         file_info = {'File': File.__str__(self)}
+
+        # Nagłówek Header
         header_line = tuple(next(self.file_path).split('"')[1::2])
         file_info.update({'Header': header_line})
+
+        # Reszta file info przystosowanym do formatu pliku.
         next(self)
         header_line = next(self.file_path).split('"')[1::2]
+
         while header_line:
-            # while header_line is None:
-            #     break
             key = header_line[0]
             value = header_line[1] if len(header_line) > 1 else None
             file_info.update({key: value})
             header_line = next(self.file_path).split('"')[1::2]
+
         return file_info
 
     @staticmethod
@@ -52,6 +57,7 @@ class File:
 
 class Line(File):
     number_of_line = 0
+
     def __init__(self, line_id_class, line_point_class):
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
@@ -61,6 +67,7 @@ class Line(File):
 
     def __str__(self):
         return str(self.line_class)
+
     @staticmethod
     def simplifier(list_of_line_class):
         for current_line in list_of_line_class:
@@ -68,6 +75,7 @@ class Line(File):
             current_line.line_class.update(
                 {'Line': {'Info': current_line.line_class['Line']['Info'], 'PointList': current_point_line}})
         return list_of_line_class
+
 
 # file = File('krawedzie.geo')
 file = File('GRZ-25511-27300.geo')
@@ -82,10 +90,8 @@ assert str(file).endswith('.geo')
 
 
 def generate_line_names_points():
-    '''
-    Generowanie punktów linii.
-    :return:
-    '''
+
+    # Generowanie punktów linii.
     line_point = []
     for _ in file:
         if line_point_pattern.match(_):
