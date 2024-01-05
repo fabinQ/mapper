@@ -11,7 +11,7 @@ class File:
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
         self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
-        self.json_file(self.file_info, self.file_name)
+        # self.json_file(self.file_info, self.file_name)
 
     def __next__(self):
         return next(self.file_path).rstrip()
@@ -56,7 +56,7 @@ class File:
 
 
 class Line(File):
-    number_of_line = 0
+    # number_of_line = 0
 
     def __init__(self, line_id_class, line_point_class):
         self.line_id_class = line_id_class
@@ -68,14 +68,32 @@ class Line(File):
     def __str__(self):
         return str(self.line_class)
 
+    def get_line_class(self):
+        return self.line_class
+    def get_line_id(self):
+        return self.line_id_class
+
+    def get_point_list(self):
+        return self.line_point_class
     @staticmethod
-    def simplifier(list_of_line_class):
+    def simplifier(list_of_line_class, level_of_simplify):
         for current_line in list_of_line_class:
-            current_point_line = current_line.line_point_class[0::2]
+            current_point_line = current_line.line_point_class[0::level_of_simplify]
             current_line.line_class.update(
                 {'Line': {'Info': current_line.line_class['Line']['Info'], 'PointList': current_point_line}})
         return list_of_line_class
 
+    @staticmethod
+    def generate_line_names_points():
+
+        # Generowanie punktów linii.
+        line_point = []
+        for _ in file:
+            if line_point_pattern.match(_):
+                line_point_dic = line_point_pattern.match(_).groupdict()
+                line_point.append(line_point_dic)
+            elif _ == '\tend':
+                return line_point
 
 # file = File('krawedzie.geo')
 file = File('GRZ-25511-27300.geo')
@@ -89,16 +107,7 @@ file = File('GRZ-25511-27300.geo')
 assert str(file).endswith('.geo')
 
 
-def generate_line_names_points():
 
-    # Generowanie punktów linii.
-    line_point = []
-    for _ in file:
-        if line_point_pattern.match(_):
-            line_point_dic = line_point_pattern.match(_).groupdict()
-            line_point.append(line_point_dic)
-        elif _ == '\tend':
-            return line_point
 
 
 line_pattern = re.compile(r'\tLine "(?P<ID_line>.+?)"?,(?P<Polygon>\d+|)?,(?P<Descriptoin>.+)?')
@@ -109,9 +118,10 @@ list_of_line_class = []
 
 # Generowanie nowych instancji linii z pliku tekstowego
 for line in file:
+    # Jeśli znajdzie pattern linii to odczytuje opis tej linii, następnie odczytuje punkty tej linii
     if line_pattern.match(line):
         line_id = line_pattern.match(line).groupdict()
-        line_points = generate_line_names_points()
+        line_points = Line.generate_line_names_points()
 
         # Tworzenie instancji klasy Line
         line_instance = Line(line_id, line_points)
@@ -119,9 +129,19 @@ for line in file:
         # Przypisanie instancji do słownika pod unikalnym kluczem
         list_of_line_class.append(line_instance)
 
+# Utworzenie nowego pliku z liniami (opcja)
 file_name = file.file_name.rstrip('.json') + "_new_lines.json"
 
-list_of_line_class = Line.simplifier(list_of_line_class)
-
-for x in list_of_line_class:
+level_of_simplify = 5
+list_of_simplifier_line_class = Line.simplifier(list_of_line_class, level_of_simplify)
+y={}
+for x in list_of_simplifier_line_class:
     print(x)
+    print(x.get_line_class())
+    print(x.get_point_list())
+    print(x.get_line_id())
+    # y = {x.get_line_id(): x.get_point_list()}
+    print(y)
+    # y.append(list(x))
+print(y)
+Line.json_file(y,file_name)
