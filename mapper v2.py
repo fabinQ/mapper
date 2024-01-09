@@ -6,6 +6,7 @@ import re
 
 
 class File:
+    # TODO: Sprawdzić hierarchię klas
     def __init__(self, file_path):
         self.data_time_stamp = self.formatted_datatime
         self.file_path = open(file_path, 'r', encoding='utf-8')
@@ -21,6 +22,9 @@ class File:
 
     def __str__(self):
         return self.file_path.name
+    # TODO: ewentualnie dodać __enter__ __exit__
+
+    # TODO: Dodać funkcję zapisywania pliku .geo - nagłówek + linie
 
     def header(self):
         # Utworzenie zmiennych składowych takich jak nazwa pliku
@@ -70,11 +74,13 @@ class Line(File):
 
     def get_line_class(self):
         return self.line_class
+
     def get_line_id(self):
         return self.line_id_class
 
     def get_point_list(self):
         return self.line_point_class
+
     @staticmethod
     def simplifier(list_of_line_class, level_of_simplify):
         for current_line in list_of_line_class:
@@ -95,6 +101,7 @@ class Line(File):
             elif _ == '\tend':
                 return line_point
 
+
 # file = File('krawedzie.geo')
 file = File('GRZ-25511-27300.geo')
 # file = File('krawedzie3.geo')
@@ -105,10 +112,6 @@ file = File('GRZ-25511-27300.geo')
 # file = File('ŚR i CH.geo')
 
 assert str(file).endswith('.geo')
-
-
-
-
 
 line_pattern = re.compile(r'\tLine "(?P<ID_line>.+?)"?,(?P<Polygon>\d+|)?,(?P<Descriptoin>.+)?')
 line_point_pattern = re.compile(r'\t\t\tPoint(?: "(?P<Number>.+|)")?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
@@ -134,7 +137,9 @@ file_name = file.file_name.rstrip('.json') + "_new_lines.json"
 
 level_of_simplify = 5
 list_of_simplifier_line_class = Line.simplifier(list_of_line_class, level_of_simplify)
-y={}
+
+# TODO: sprawdzić co tu się dzieje
+y = {}
 for x in list_of_simplifier_line_class:
     print(x)
     print(x.get_line_class())
@@ -144,4 +149,4 @@ for x in list_of_simplifier_line_class:
     print(y)
     # y.append(list(x))
 print(y)
-Line.json_file(y,file_name)
+Line.json_file(y, file_name)
