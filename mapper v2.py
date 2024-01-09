@@ -3,7 +3,7 @@ import json
 import sys
 import datetime
 import re
-
+from abc import ABC, abstractmethod
 
 class File:
     # TODO: Sprawdzić hierarchię klas
@@ -125,9 +125,12 @@ class Abstract(File):
         if not os.path.exists('./geo_files'):
             os.mkdir('./geo_files')
             # with open(file_name, "a", encoding="utf-8", errors="xmlcharrefreplace") as json_file:
-        print(self.file_path)
+        print(File.__str__(file))
         for i in list_of_lines:
             print(i)
+    @abstractmethod
+    def __str__(self):
+        pass
 
     #     json.dump(content, json_file, indent=2)
     #     json_file.write('\n')
