@@ -12,7 +12,7 @@ class File:
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
         self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
-        # self.json_file(self.file_info, self.file_name)
+        self.json_file(self.file_info, self.file_name)
 
     def __next__(self):
         return next(self.file_path).rstrip()
@@ -46,8 +46,7 @@ class File:
 
         return file_info
 
-    @staticmethod
-    def json_file(content, file_name):
+    def json_file(self, content, file_name):
         if not os.path.exists('./json'):
             os.mkdir('./json')
         with open(file_name, "a", encoding="utf-8", errors="xmlcharrefreplace") as json_file:
@@ -60,8 +59,6 @@ class File:
 
 
 class Line(File):
-    # number_of_line = 0
-
     def __init__(self, line_id_class, line_point_class):
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
@@ -81,6 +78,9 @@ class Line(File):
     def get_point_list(self):
         return self.line_point_class
 
+
+
+
     @staticmethod
     def simplifier(list_of_line_class, level_of_simplify):
         for current_line in list_of_line_class:
@@ -90,7 +90,7 @@ class Line(File):
         return list_of_line_class
 
     @staticmethod
-    def generate_line_names_points():
+    def generate_line_points():
 
         # Generowanie punktów linii.
         line_point = []
@@ -100,6 +100,37 @@ class Line(File):
                 line_point.append(line_point_dic)
             elif _ == '\tend':
                 return line_point
+
+    @staticmethod
+    def generate_line_names():
+        # Generowanie nowych instancji linii z pliku tekstowego
+        for line in file:
+            # Jeśli znajdzie pattern linii to odczytuje opis tej linii, następnie odczytuje punkty tej linii
+            if line_pattern.match(line):
+                line_id = line_pattern.match(line).groupdict()
+                line_points = Line.generate_line_points()
+
+                # Tworzenie instancji klasy Line
+                line_instance = Line(line_id, line_points)
+
+                # Przypisanie instancji do słownika pod unikalnym kluczem
+                list_of_line_class.append(line_instance)
+        return list_of_line_class
+
+class Abstract(File):
+    def __init__(self, list):
+        self.list = list
+
+    def save_to_geo_file(self, list_of_lines):
+        if not os.path.exists('./geo_files'):
+            os.mkdir('./geo_files')
+            # with open(file_name, "a", encoding="utf-8", errors="xmlcharrefreplace") as json_file:
+        print(self.file_path)
+        for i in list_of_lines:
+            print(i)
+
+    #     json.dump(content, json_file, indent=2)
+    #     json_file.write('\n')
 
 
 # file = File('krawedzie.geo')
@@ -120,33 +151,26 @@ line_point_pattern = re.compile(r'\t\t\tPoint(?: "(?P<Number>.+|)")?,(?P<X>\d+\.
 list_of_line_class = []
 
 # Generowanie nowych instancji linii z pliku tekstowego
-for line in file:
-    # Jeśli znajdzie pattern linii to odczytuje opis tej linii, następnie odczytuje punkty tej linii
-    if line_pattern.match(line):
-        line_id = line_pattern.match(line).groupdict()
-        line_points = Line.generate_line_names_points()
-
-        # Tworzenie instancji klasy Line
-        line_instance = Line(line_id, line_points)
-
-        # Przypisanie instancji do słownika pod unikalnym kluczem
-        list_of_line_class.append(line_instance)
+list_of_line_class = Line.generate_line_names()
 
 # Utworzenie nowego pliku z liniami (opcja)
 file_name = file.file_name.rstrip('.json') + "_new_lines.json"
 
+# Utworzenie zmiennej do upraszczania oraz utworzenie listy klas linii po wyprostowaniu
 level_of_simplify = 5
-list_of_simplifier_line_class = Line.simplifier(list_of_line_class, level_of_simplify)
+list_of_line_class = Line.simplifier(list_of_line_class, level_of_simplify)
+AbstractInstance = Abstract(list_of_line_class)
+
+AbstractInstance.save_to_geo_file(list_of_line_class)
 
 # TODO: sprawdzić co tu się dzieje
-y = {}
-for x in list_of_simplifier_line_class:
-    print(x)
-    print(x.get_line_class())
-    print(x.get_point_list())
-    print(x.get_line_id())
+# y = {}
+# for x in list_of_simplifier_line_class:
+#     print(x)
+    # print(x.get_line_class())
+    # print(x.get_point_list())
+    # print(x.get_line_id())
     # y = {x.get_line_id(): x.get_point_list()}
-    print(y)
+    # print(y)
     # y.append(list(x))
-print(y)
-Line.json_file(y, file_name)
+# print(y)
