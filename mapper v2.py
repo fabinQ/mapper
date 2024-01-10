@@ -53,6 +53,9 @@ class File:
             json.dump(content, json_file, indent=2)
             json_file.write('\n')
 
+
+    def get_header(self):
+        return self.file_info
     @property
     def formatted_datatime(self):
         return datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S")
@@ -60,6 +63,7 @@ class File:
 
 class Line(File):
     def __init__(self, line_id_class, line_point_class):
+        super().__init__(file.file_name)
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
         self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class})}
@@ -117,23 +121,23 @@ class Line(File):
                 list_of_line_class.append(line_instance)
         return list_of_line_class
 
-class Abstract(File):
-    def __init__(self, list):
-        self.list = list
-
-    def save_to_geo_file(self, list_of_lines):
-        if not os.path.exists('./geo_files'):
-            os.mkdir('./geo_files')
-            # with open(file_name, "a", encoding="utf-8", errors="xmlcharrefreplace") as json_file:
-        print(File.__str__(file))
-        for i in list_of_lines:
-            print(i)
-    @abstractmethod
-    def __str__(self):
-        pass
-
-    #     json.dump(content, json_file, indent=2)
-    #     json_file.write('\n')
+# class Abstract(File):
+#     def __init__(self, list):
+#         self.list = list
+#         self.file_path = './geo_files/' + File.__str__(file).rstrip('.geo') + '_3DG.geo'
+#
+#     def save_to_geo_file(self, list_of_lines):
+#         if not os.path.exists('./geo_files'):
+#             os.mkdir('./geo_files')
+#         with open(self.file_path, "a", encoding="utf-8", errors="xmlcharrefreplace") as geo_file:
+#             geo_file.write('FileHeader ' + super().get_header())
+#             for i in list_of_lines:
+#                 print(i)
+#     @abstractmethod
+#     def __str__(self):
+#         pass
+#     def get_header(self):
+#         super().get_header()
 
 
 # file = File('krawedzie.geo')
@@ -162,9 +166,9 @@ file_name = file.file_name.rstrip('.json') + "_new_lines.json"
 # Utworzenie zmiennej do upraszczania oraz utworzenie listy klas linii po wyprostowaniu
 level_of_simplify = 5
 list_of_line_class = Line.simplifier(list_of_line_class, level_of_simplify)
-AbstractInstance = Abstract(list_of_line_class)
-
-AbstractInstance.save_to_geo_file(list_of_line_class)
+# AbstractInstance = Abstract(list_of_line_class)
+#
+# AbstractInstance.save_to_geo_file(list_of_line_class)
 
 # TODO: sprawdzić co tu się dzieje
 # y = {}
