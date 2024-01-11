@@ -5,7 +5,28 @@ import datetime
 import re
 from abc import ABC, abstractmethod
 
-class File:
+
+class Saver():
+    def __init__(self, File, Lines):
+        self.File = File
+        self.Lines = Lines
+
+    def line(self):
+        for line in self.Lines:
+            yield line
+
+    def save_to_geo_file(self):
+        if not os.path.exists('./geo_files'):
+            os.mkdir('./geo_files')
+        print(self.File.__str__())
+        with open(self.File.__str__(), "a", encoding="utf-8", errors="xmlcharrefreplace") as geo_file:
+            geo_file.write('FileHeader ' + self.File.get_header())
+            geo_file.write('begin')
+            while self.line():
+                print(self.line())
+
+
+class File(Saver):
     # TODO: Sprawdzić hierarchię klas
     def __init__(self, file_path):
         self.data_time_stamp = self.formatted_datatime
@@ -61,9 +82,8 @@ class File:
         return datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S")
 
 
-class Line(File):
+class Line(Saver):
     def __init__(self, line_id_class, line_point_class):
-        super().__init__(file.file_name)
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
         self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class})}
@@ -126,13 +146,7 @@ class Line(File):
 #         self.list = list
 #         self.file_path = './geo_files/' + File.__str__(file).rstrip('.geo') + '_3DG.geo'
 #
-#     def save_to_geo_file(self, list_of_lines):
-#         if not os.path.exists('./geo_files'):
-#             os.mkdir('./geo_files')
-#         with open(self.file_path, "a", encoding="utf-8", errors="xmlcharrefreplace") as geo_file:
-#             geo_file.write('FileHeader ' + super().get_header())
-#             for i in list_of_lines:
-#                 print(i)
+
 #     @abstractmethod
 #     def __str__(self):
 #         pass
@@ -166,9 +180,9 @@ file_name = file.file_name.rstrip('.json') + "_new_lines.json"
 # Utworzenie zmiennej do upraszczania oraz utworzenie listy klas linii po wyprostowaniu
 level_of_simplify = 5
 list_of_line_class = Line.simplifier(list_of_line_class, level_of_simplify)
-# AbstractInstance = Abstract(list_of_line_class)
-#
-# AbstractInstance.save_to_geo_file(list_of_line_class)
+
+SaverInstance = Saver(file, list_of_line_class)
+SaverInstance.save_to_geo_file()
 
 # TODO: sprawdzić co tu się dzieje
 # y = {}
