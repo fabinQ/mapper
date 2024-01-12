@@ -7,23 +7,35 @@ from abc import ABC, abstractmethod
 
 
 class Saver():
-    def __init__(self, File, Lines):
-        self.File = File
+    def __init__(self, File_instance, Lines):
+        self.File_instance = File_instance
         self.Lines = Lines
 
     def line(self):
         for line in self.Lines:
             yield line
 
+    def file_name_finished_file(self):
+        return os.path.join('.','geo_files', str(self.File_instance).rstrip('.geo') + '_3DG.geo')
+
+
+    def create_subfolder(self, subfolder):
+        if not os.path.exists(os.path.join('.',subfolder)):
+            os.mkdir(subfolder)
+
+    def header_to_geo(self):
+        header = ['FileHeader ',",".join(f'"{value}"' for value in self.File_instance.get_header()['Header']), '\nbegin']
+        file_info = ['\tFileInfo '.join(f'"{value}"' for value in self.File_instance.get_header()['Header'])]
+        return header
+
     def save_to_geo_file(self):
-        if not os.path.exists('./geo_files'):
-            os.mkdir('./geo_files')
-        print(self.File.__str__())
-        with open(self.File.__str__(), "a", encoding="utf-8", errors="xmlcharrefreplace") as geo_file:
-            geo_file.write('FileHeader ' + self.File.get_header())
-            geo_file.write('begin')
-            while self.line():
-                print(self.line())
+        self.create_subfolder('geo_files')
+        print(self.header_to_geo())
+        print(self.file_name_finished_file())
+        with open(self.file_name_finished_file(), "w", encoding="utf-8") as geo_file:
+            geo_file.writelines(File.header_to_geo(self))
+            # while self.line():
+            #     print(self.line())
 
 
 class File(Saver):
@@ -64,12 +76,15 @@ class File(Saver):
             value = header_line[1] if len(header_line) > 1 else None
             file_info.update({key: value})
             header_line = next(self.file_path).split('"')[1::2]
-
+        print(file_info)
         return file_info
 
     def json_file(self, content, file_name):
-        if not os.path.exists('./json'):
-            os.mkdir('./json')
+
+        # Sprawdza, czy dany katalog istnieje, jeśli nie to go tworzy
+        self.create_subfolder('json')
+
+        # Zapisuje do pliku
         with open(file_name, "a", encoding="utf-8", errors="xmlcharrefreplace") as json_file:
             json.dump(content, json_file, indent=2)
             json_file.write('\n')
@@ -175,7 +190,7 @@ list_of_line_class = []
 list_of_line_class = Line.generate_line_names()
 
 # Utworzenie nowego pliku z liniami (opcja)
-file_name = file.file_name.rstrip('.json') + "_new_lines.json"
+# file_name = file.file_name.rstrip('.json') + "_new_lines.json"
 
 # Utworzenie zmiennej do upraszczania oraz utworzenie listy klas linii po wyprostowaniu
 level_of_simplify = 5
