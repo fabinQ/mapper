@@ -24,18 +24,18 @@ class Saver():
             os.mkdir(subfolder)
 
     def header_to_geo(self):
-        header = ['FileHeader ',",".join(f'"{value}"' for value in self.File_instance.get_header()['Header']), '\nbegin']
+        header = ['FileHeader ',",".join(f'"{value}"' for value in self.File_instance.get_header()['Header']), '\nbegin\n']
         for key, value in self.File_instance.get_header().items():
             if key == 'File':
                 pass
             elif key == 'Header':
                 pass
             else:
-                print(f'FileInfo "{key}","{value}",\n')
-                # file_info = ['\tFileInfo '.join(f'"{key}","{value}",\n']
-                #
-                # print(file_info)
-
+                if not value:
+                    header.append(f'\tFileInfo "{key}",\n')
+                else:
+                    header.append(f'\tFileInfo "{key}","{value}"\n')
+        header.extend(['end\n','PointList\n','LineList\n','begin\n'])
         return header
 
     def save_to_geo_file(self):
@@ -177,8 +177,8 @@ class Line(Saver):
 #         super().get_header()
 
 
-# file = File('krawedzie.geo')
-file = File('GRZ-25511-27300.geo')
+file = File('krawedzie.geo')
+# file = File('GRZ-25511-27300.geo')
 # file = File('krawedzie3.geo')
 # file = File('1.geo')
 # file = File('Chorzew_T5_spód_tłucznia.geo')
