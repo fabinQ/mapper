@@ -25,13 +25,21 @@ class Saver():
 
     def header_to_geo(self):
         header = ['FileHeader ',",".join(f'"{value}"' for value in self.File_instance.get_header()['Header']), '\nbegin']
-        file_info = ['\tFileInfo '.join(f'"{value}"' for value in self.File_instance.get_header()['Header'])]
+        for key, value in self.File_instance.get_header().items():
+            if key == 'File':
+                pass
+            elif key == 'Header':
+                pass
+            else:
+                print(f'FileInfo "{key}","{value}",\n')
+                # file_info = ['\tFileInfo '.join(f'"{key}","{value}",\n']
+                #
+                # print(file_info)
+
         return header
 
     def save_to_geo_file(self):
         self.create_subfolder('geo_files')
-        print(self.header_to_geo())
-        print(self.file_name_finished_file())
         with open(self.file_name_finished_file(), "w", encoding="utf-8") as geo_file:
             geo_file.writelines(File.header_to_geo(self))
             # while self.line():
@@ -57,7 +65,7 @@ class File(Saver):
         return self.file_path.name
     # TODO: ewentualnie dodać __enter__ __exit__
 
-    # TODO: Dodać funkcję zapisywania pliku .geo - nagłówek + linie
+    # TODO: Naprawić header - nie wyświetla wartości None
 
     def header(self):
         # Utworzenie zmiennych składowych takich jak nazwa pliku
