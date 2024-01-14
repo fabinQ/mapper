@@ -7,32 +7,39 @@ from abc import ABC, abstractmethod
 
 
 class Saver():
+    # instancja klasy składająca się z klasy File i klas Line 
     def __init__(self, File_instance, Lines):
         self.File_instance = File_instance
         self.Lines = Lines
 
     def line(self):
+        # Zwraca kolejne instancje klasy Line
         for line in self.Lines:
             yield line
 
     def file_name_finished_file(self):
+        # Tworzy ścieżkę do pliku geo
         return os.path.join('.','geo_files', str(self.File_instance).rstrip('.geo') + '_3DG.geo')
 
 
     def create_subfolder(self, subfolder):
+        # Funkcja sprawdza czy subfolder istnieje, jeśli nie to go tworzy
         if not os.path.exists(os.path.join('.',subfolder)):
             os.mkdir(subfolder)
             
     @staticmethod
     def quote(self, argument):
+        #Funkcja dodaje "" jesli argument nie jest pusty - "argument"
         if argument:
             return f'"{argument}"'
         else: 
             return ''
             
     def header_to_geo(self):
+        # Z klasy File tworzy nagłówek pliku geo
         for key, value in self.File_instance.get_header().items():
             if key == 'File':
+                # pomija nazwe pliku
                 pass
             elif key == 'Header':
                 header = ['FileHeader ',",".join(guote(f'{value}'), '\nbegin\n']
@@ -42,34 +49,38 @@ class Saver():
         return header
 
     def line_to_geo(self):
+        # Z klasy Line tworzy linie do pliku geo
         lines = []
-        for line in self.Lines:
+        for line in self.line():
+            # Najpierw tworzy id linii
             id = line.get_line_id()
-            if 
             lines.append(f'\tLine {guote(id[ID_line])},{id[Polygon]},{id[Descriptoin]})
             lines.extend(['\n\tbegin\n','\t\tPointList\n','\t\tbegin'])
+            
             for point in line.get_point_list()):
+                # Potem dodaje współrzędne linii
                 lines.append(f'\n\t\tPoint {quote(point[Number])},{point[X]},{point[Y]},{point[Z]},{point[Code]},,')
+                
             lines.extend(['\n\t\tend','\n\t\tAttributeList','\n\t\tbegin','\n\t\t\tAttribute','\n\t\tend',\n\tend\n'])
         lines.extend(['end\n','AttributeList'])
         return lines
         
         
-        
     def save_to_geo_file(self):
+        # Tworzy subfolder, oraz zapisuje nagłówek i linie
         self.create_subfolder('geo_files')
         with open(self.file_name_finished_file(), "w", encoding="utf-8") as geo_file:
             geo_file.writelines(File.header_to_geo(self))
             geo_file.writelines(File.line_to_geo(self))
             
 
-
 class File(Saver):
-    # TODO: Sprawdzić hierarchię klas
+    # Tworzy instancje klasy File - jest jednocześnie generatorem. Tworzy nagłówek i zapisuje do pliku json
     def __init__(self, file_path):
         self.data_time_stamp = self.formatted_datatime
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
+        
         self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
         self.json_file(self.file_info, self.file_name)
 
@@ -85,7 +96,7 @@ class File(Saver):
 
     def header(self):
         # Utworzenie zmiennych składowych takich jak nazwa pliku
-        file_info = {'File': File.__str__(self)}
+        file_info = {'File': File.__str__(self)} #### self.__str__()
 
         # Nagłówek Header
         header_line = tuple(next(self.file_path).split('"')[1::2])
@@ -116,12 +127,15 @@ class File(Saver):
 
     def get_header(self):
         return self.file_info
+        
+        
     @property
     def formatted_datatime(self):
         return datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S")
 
 
 class Line(Saver):
+    
     def __init__(self, line_id_class, line_point_class):
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
@@ -129,19 +143,21 @@ class Line(Saver):
         # self.json_file(self.line_class, file_name)
         # number_of_line +=1
 
+
     def __str__(self):
         return str(self.line_class)
+
 
     def get_line_class(self):
         return self.line_class
 
+
     def get_line_id(self):
         return self.line_id_class
 
+
     def get_point_list(self):
         return self.line_point_class
-
-
 
 
     @staticmethod
