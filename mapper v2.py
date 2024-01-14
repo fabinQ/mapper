@@ -1,16 +1,20 @@
 import os
 import json
-import sys
 import datetime
 import re
-from abc import ABC, abstractmethod
 
 
-class Saver():
+def create_subfolder(subfolder):
+    # Funkcja sprawdza czy subfolder istnieje, jeśli nie to go tworzy
+    if not os.path.exists(os.path.join('.', subfolder)):
+        os.mkdir(subfolder)
+
+
+class Saver:
     # instancja klasy składająca się z klasy File i klas Line 
-    def __init__(self, File_instance, Lines):
-        self.File_instance = File_instance
-        self.Lines = Lines
+    def __init__(self, file_instance, lines_instance):
+        self.File_instance = file_instance
+        self.Lines = lines_instance
 
     def line(self):
         # Zwraca kolejne instancje klasy Line
@@ -19,60 +23,58 @@ class Saver():
 
     def file_name_finished_file(self):
         # Tworzy ścieżkę do pliku geo
-        return os.path.join('.','geo_files', str(self.File_instance).rstrip('.geo') + '_3DG.geo')
+        return os.path.join('.', 'geo_files', str(self.File_instance).rstrip('.geo') + '_3DG.geo')
 
-
-    def create_subfolder(self, subfolder):
-        # Funkcja sprawdza czy subfolder istnieje, jeśli nie to go tworzy
-        if not os.path.exists(os.path.join('.',subfolder)):
-            os.mkdir(subfolder)
-            
     @staticmethod
-    def quote(self, argument):
-        #Funkcja dodaje "" jesli argument nie jest pusty - "argument"
+    def quote(argument):
+        # Funkcja dodaje "" jeśli argument nie jest pusty - "argument"
         if argument:
             return f'"{argument}"'
-        else: 
+        else:
             return ''
-            
+
     def header_to_geo(self):
         # Z klasy File tworzy nagłówek pliku geo
+        # global header
+        header = []
         for key, value in self.File_instance.get_header().items():
             if key == 'File':
                 # pomija nazwe pliku
                 pass
             elif key == 'Header':
-                header = ['FileHeader ',",".join(guote(f'{value}'), '\nbegin\n']
+                header = ['FileHeader ', ",".join(f'"{_}"'for _ in value), '\nbegin\n']
             else:
-                header.append(f'\tFileInfo {guote(key)},{guote(value)}\n')
-        header.extend(['end\n','PointList\n','LineList\n','begin\n'])
+                header.append(f'\tFileInfo {self.quote(key)},{self.quote(value)}\n')
+        header.extend(['end\n', 'PointList\n', 'LineList\n', 'begin\n'])
         return header
 
     def line_to_geo(self):
         # Z klasy Line tworzy linie do pliku geo
         lines = []
+        # TODO poprawić tę funkcje - dodaje None
         for line in self.line():
             # Najpierw tworzy id linii
-            id = line.get_line_id()
-            lines.append(f'\tLine {guote(id[ID_line])},{id[Polygon]},{id[Descriptoin]})
-            lines.extend(['\n\tbegin\n','\t\tPointList\n','\t\tbegin'])
-            
-            for point in line.get_point_list()):
+            id_line = line.get_line_id()
+            lines.append(f'\tLine {self.quote(id_line["ID_line"])},{id_line["Polygon"]},{id_line["Descriptoin"]}')
+            lines.extend(['\n\tbegin\n', '\t\tPointList\n', '\t\tbegin'])
+
+            for point in line.get_point_list():
                 # Potem dodaje współrzędne linii
-                lines.append(f'\n\t\tPoint {quote(point[Number])},{point[X]},{point[Y]},{point[Z]},{point[Code]},,')
-                
-            lines.extend(['\n\t\tend','\n\t\tAttributeList','\n\t\tbegin','\n\t\t\tAttribute','\n\t\tend',\n\tend\n'])
-        lines.extend(['end\n','AttributeList'])
+                lines.append(
+                    f'\n\t\tPoint {self.quote(point["Number"])},{point["X"]},{point["Y"]},{point["Z"]},{point["Code"]},,')
+
+            lines.extend(
+                ['\n\t\tend', '\n\t\tAttributeList', '\n\t\tbegin', '\n\t\t\tAttribute', '\n\t\tend', '\n\tend\n'])
+        lines.extend(['end\n', 'AttributeList'])
         return lines
-        
-        
+
     def save_to_geo_file(self):
         # Tworzy subfolder, oraz zapisuje nagłówek i linie
-        self.create_subfolder('geo_files')
+        create_subfolder('geo_files')
         with open(self.file_name_finished_file(), "w", encoding="utf-8") as geo_file:
             geo_file.writelines(File.header_to_geo(self))
             geo_file.writelines(File.line_to_geo(self))
-            
+
 
 class File(Saver):
     # Tworzy instancje klasy File - jest jednocześnie generatorem. Tworzy nagłówek i zapisuje do pliku json
@@ -80,7 +82,7 @@ class File(Saver):
         self.data_time_stamp = self.formatted_datatime
         self.file_path = open(file_path, 'r', encoding='utf-8')
         self.file_info = self.header()
-        
+
         self.file_name = './json/' + self.data_time_stamp + ' ' + self.file_info.get('Company') + '.json'
         self.json_file(self.file_info, self.file_name)
 
@@ -92,11 +94,12 @@ class File(Saver):
 
     def __str__(self):
         return self.file_path.name
+
     # TODO: ewentualnie dodać __enter__ __exit__
 
     def header(self):
         # Utworzenie zmiennych składowych takich jak nazwa pliku
-        file_info = {'File': File.__str__(self)} #### self.__str__()
+        file_info = {'File': File.__str__(self)}  #### self.__str__()
 
         # Nagłówek Header
         header_line = tuple(next(self.file_path).split('"')[1::2])
@@ -114,28 +117,26 @@ class File(Saver):
         print(file_info)
         return file_info
 
-    def json_file(self, content, file_name):
-
+    @staticmethod
+    def json_file(content, file_name):
         # Sprawdza, czy dany katalog istnieje, jeśli nie to go tworzy
-        self.create_subfolder('json')
+        create_subfolder('json')
 
         # Zapisuje do pliku
         with open(file_name, "a", encoding="utf-8", errors="xmlcharrefreplace") as json_file:
             json.dump(content, json_file, indent=2)
             json_file.write('\n')
 
-
     def get_header(self):
         return self.file_info
-        
-        
+
     @property
     def formatted_datatime(self):
         return datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S")
 
 
 class Line(Saver):
-    
+
     def __init__(self, line_id_class, line_point_class):
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
@@ -143,22 +144,17 @@ class Line(Saver):
         # self.json_file(self.line_class, file_name)
         # number_of_line +=1
 
-
     def __str__(self):
         return str(self.line_class)
-
 
     def get_line_class(self):
         return self.line_class
 
-
     def get_line_id(self):
         return self.line_id_class
 
-
     def get_point_list(self):
         return self.line_point_class
-
 
     @staticmethod
     def simplifier(list_of_line_class, level_of_simplify):
@@ -195,6 +191,7 @@ class Line(Saver):
                 # Przypisanie instancji do słownika pod unikalnym kluczem
                 list_of_line_class.append(line_instance)
         return list_of_line_class
+
 
 # class Abstract(File):
 #     def __init__(self, list):
@@ -243,10 +240,10 @@ SaverInstance.save_to_geo_file()
 # y = {}
 # for x in list_of_simplifier_line_class:
 #     print(x)
-    # print(x.get_line_class())
-    # print(x.get_point_list())
-    # print(x.get_line_id())
-    # y = {x.get_line_id(): x.get_point_list()}
-    # print(y)
-    # y.append(list(x))
+# print(x.get_line_class())
+# print(x.get_point_list())
+# print(x.get_line_id())
+# y = {x.get_line_id(): x.get_point_list()}
+# print(y)
+# y.append(list(x))
 # print(y)
