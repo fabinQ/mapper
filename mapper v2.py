@@ -22,28 +22,46 @@ class Saver():
     def create_subfolder(self, subfolder):
         if not os.path.exists(os.path.join('.',subfolder)):
             os.mkdir(subfolder)
-
+            
+    @staticmethod
+    def quote(self, argument):
+        if argument:
+            return f'"{argument}"'
+        else: 
+            return ''
+            
     def header_to_geo(self):
-        header = ['FileHeader ',",".join(f'"{value}"' for value in self.File_instance.get_header()['Header']), '\nbegin\n']
         for key, value in self.File_instance.get_header().items():
             if key == 'File':
                 pass
             elif key == 'Header':
-                pass
+                header = ['FileHeader ',",".join(guote(f'{value}'), '\nbegin\n']
             else:
-                if not value:
-                    header.append(f'\tFileInfo "{key}",\n')
-                else:
-                    header.append(f'\tFileInfo "{key}","{value}"\n')
+                header.append(f'\tFileInfo {guote(key)},{guote(value)}\n')
         header.extend(['end\n','PointList\n','LineList\n','begin\n'])
         return header
 
+    def line_to_geo(self):
+        lines = []
+        for line in self.Lines:
+            id = line.get_line_id()
+            if 
+            lines.append(f'\tLine {guote(id[ID_line])},{id[Polygon]},{id[Descriptoin]})
+            lines.extend(['\n\tbegin\n','\t\tPointList\n','\t\tbegin'])
+            for point in line.get_point_list()):
+                lines.append(f'\n\t\tPoint {quote(point[Number])},{point[X]},{point[Y]},{point[Z]},{point[Code]},,')
+            lines.extend(['\n\t\tend','\n\t\tAttributeList','\n\t\tbegin','\n\t\t\tAttribute','\n\t\tend',\n\tend\n'])
+        lines.extend(['end\n','AttributeList'])
+        return lines
+        
+        
+        
     def save_to_geo_file(self):
         self.create_subfolder('geo_files')
         with open(self.file_name_finished_file(), "w", encoding="utf-8") as geo_file:
             geo_file.writelines(File.header_to_geo(self))
-            # while self.line():
-            #     print(self.line())
+            geo_file.writelines(File.line_to_geo(self))
+            
 
 
 class File(Saver):
@@ -64,8 +82,6 @@ class File(Saver):
     def __str__(self):
         return self.file_path.name
     # TODO: ewentualnie dodać __enter__ __exit__
-
-    # TODO: Naprawić header - nie wyświetla wartości None
 
     def header(self):
         # Utworzenie zmiennych składowych takich jak nazwa pliku
