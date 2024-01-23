@@ -206,7 +206,8 @@ class Line(Saver):
 #         super().get_header()
 
 
-file = File('krawedzie.geo')
+# file = File('krawedzie.geo')
+file = File('skarpy_EdgeLines.geo')
 # file = File('GRZ-25511-27300.geo')
 # file = File('krawedzie3.geo')
 # file = File('1.geo')
