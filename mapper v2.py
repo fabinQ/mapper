@@ -9,24 +9,18 @@ def create_subfolder(subfolder):
     if not os.path.exists(os.path.join('.', subfolder)):
         os.mkdir(subfolder)
 
-
 def quote(argument):
-    if argument:
+    # Funkcja dodaje "" jeśli argument nie jest pusty - "argument"
+    if argument.__class__ is dict:
+        for key, value in argument.items():
+            if not value is None:
+                value = value.strip('"')
+            argument.update({key: value})
+        return argument
+    elif argument:
         return f'"{argument}"'
     else:
         return ''
-
-
-def space_value(arg_space):
-    if arg_space == ' ':
-        return ''
-    elif arg_space.startswith(' '):
-        arg_space = arg_space.lstrip(' ')
-        # quote(arg_space)
-        return quote(arg_space)
-    else:
-        quote(arg_space)
-
 
 class Saver:
     # instancja klasy składająca się z klasy File i klas Line 
@@ -42,6 +36,7 @@ class Saver:
     def file_name_finished_file(self):
         # Tworzy ścieżkę do pliku geo
         return os.path.join('.', 'geo_files', str(self.File_instance).rstrip('.geo') + '_3DG.geo')
+
 
     def header_to_geo(self):
         # Z klasy File tworzy nagłówek pliku geo
@@ -65,16 +60,16 @@ class Saver:
         for line in self.line():
             # Najpierw tworzy id linii
             id_line = line.get_line_id()
-            lines.append(f'\tLine {quote(id_line["ID_line"])},{quote(id_line["Polygon"])},{quote(id_line["Descriptoin"])}')
+            lines.append(f'\tLine {quote(id_line["ID_line"])},{id_line["Polygon"]},{id_line["Descriptoin"]}')
             lines.extend(['\n\tbegin\n', '\t\tPointList\n', '\t\tbegin'])
 
             for point in line.get_point_list():
                 # Potem dodaje współrzędne linii
                 lines.append(
-                    f'\n\t\tPoint {space_value(point["Number"])},{point["X"]},{point["Y"]},{point["Z"]},{point["Code"]},,')
-            atribute = line.get_attribute()[0]
+                    f'\n\t\tPoint {quote(point["Number"])},{point["X"]},{point["Y"]},{point["Z"]},{point["Code"]},,')
+
             lines.extend(
-                ['\n\t\tend', '\n\t\tAttributeList', '\n\t\tbegin', f'\n\t\t\tAttribute {quote(atribute['COLOR'])},{quote(atribute['VALUE'])}', '\n\t\tend', '\n\tend\n'])
+                ['\n\t\tend', '\n\t\tAttributeList', '\n\t\tbegin', '\n\t\t\tAttribute', '\n\t\tend', '\n\tend\n'])
         lines.extend(['end\n', 'AttributeList'])
         return lines
 
@@ -99,7 +94,7 @@ class File(Saver):
         self.json_file(self.file_info, self.file_name)
 
     def __next__(self):
-        return next(self.file_path).replace('"', '').rstrip()
+        return next(self.file_path).rstrip()
 
     def __iter__(self):
         return self
@@ -111,7 +106,7 @@ class File(Saver):
 
     def header(self):
         # Utworzenie zmiennych składowych takich jak nazwa pliku
-        file_info = {'File': File.__str__(self)}
+        file_info = {'File': File.__str__(self)}  #### self.__str__()
 
         # Nagłówek Header
         header_line = tuple(next(self.file_path).split('"')[1::2])
@@ -126,6 +121,7 @@ class File(Saver):
             value = header_line[1] if len(header_line) > 1 else None
             file_info.update({key: value})
             header_line = next(self.file_path).split('"')[1::2]
+        print(file_info)
         return file_info
 
     def get_header(self):
@@ -148,11 +144,10 @@ class File(Saver):
 
 class Line(Saver):
 
-    def __init__(self, line_id_class, line_point_class, line_attribute_list):
+    def __init__(self, line_id_class, line_point_class):
         self.line_id_class = line_id_class
         self.line_point_class = line_point_class
-        self.line_attribute_class = line_attribute_list
-        self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class, 'Attribute':  self.line_attribute_class})}
+        self.line_class = {'Line': ({'Info': self.line_id_class, 'PointList': self.line_point_class})}
         # self.json_file(self.line_class, file_name)
 
     def __str__(self):
@@ -167,9 +162,6 @@ class Line(Saver):
     def get_point_list(self):
         return self.line_point_class
 
-    def get_attribute(self):
-        return self.line_attribute_class
-
     @staticmethod
     def simplifier(list_of_line_class, level_of_simplify):
         for current_line in list_of_line_class:
@@ -183,16 +175,12 @@ class Line(Saver):
 
         # Generowanie punktów linii.
         line_point = []
-        line_attribute_list = []
         for _ in file:
             if line_point_pattern.match(_):
                 line_point_dic = line_point_pattern.match(_).groupdict()
                 line_point.append(line_point_dic)
-            elif line_attribute_pattern.match(_):
-                line_attribute_dic = line_attribute_pattern.match(_).groupdict()
-                line_attribute_list.append(line_attribute_dic)
             elif _ == '\tend':
-                return line_point, line_attribute_list
+                return line_point
 
     @staticmethod
     def generate_line_names():
@@ -201,18 +189,19 @@ class Line(Saver):
         for line in file:
             # Jeśli znajdzie pattern linii to odczytuje opis tej linii, następnie odczytuje punkty tej linii
             if line_pattern.match(line):
-                line_id = line_pattern.match(line).groupdict()
-                line_points, line_attribute_list = Line.generate_line_points()
+                line_id = quote(line_pattern.match(line).groupdict())
+                line_points = Line.generate_line_points()
 
                 # Tworzenie instancji klasy Line
-                line_instance = Line(line_id, line_points, line_attribute_list)
+                line_instance = Line(line_id, line_points)
 
                 # Przypisanie instancji do słownika pod unikalnym kluczem
                 list_of_line_class.append(line_instance)
         return list_of_line_class
 
 
-file = File('krawedzie.geo')
+
+# file = File('krawedzie.geo')
 file = File('skarpy_EdgeLines.geo')
 # file = File('GRZ-25511-27300.geo')
 # file = File('krawedzie3.geo')
@@ -226,8 +215,7 @@ assert str(file).endswith('.geo')
 
 line_pattern = re.compile(r'\tLine (?P<ID_line>.+?)?,(?P<Polygon>\d+|)?,(?P<Descriptoin>.+)?')
 line_point_pattern = re.compile(r'\t\t\tPoint(?P<Number>.+?)?,(?P<X>\d+\.\d+|\d+),(?P<Y>\d+\.\d+|\d+),'
-                                r'(?P<Z>\d+\.\d+|-\d+\.\d+|\d+)?(?:,(?P<Code>.*?))?,?')
-line_attribute_pattern = re.compile(r'\t\t\tAttribute (?P<COLOR>.+?)?,(?P<VALUE>.+)?')
+                                r'(?P<Z>\d+\.\d+|-\d+\.\d+|\d+)?(?:,"(?P<Code>.*?)")?,?')
 
 
 # Generowanie nowych instancji linii z pliku tekstowego
