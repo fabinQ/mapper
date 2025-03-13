@@ -30,8 +30,7 @@ def rename_file( files ):
 
 
 print("Podaj ścieżkę: ")
-# current_path = input()
-current_path = r"C:\OneDrive - 3D GEOSYSTEMY MICHAŁ JAŚKIEWICZ\Projekty iCON Office\KB CONSTRUCTION\LK 202 LĘBORK\PODFOLDERY\13.03.2025"
+current_path = input()
 extension = ".xml"
 
 fitFiles = get_files(current_path, extension, recursive = True)
