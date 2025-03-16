@@ -25,9 +25,12 @@ def remove_crosssects(file_path: str):
     except Exception as e:
         print(f"Wystąpił błąd: {e}")
 
+def main():
+    print("Podaj ścieżke do pliku")
+    file_path = input().strip('"')
+    file_path.split('"')
 
-print("Podaj ścieżke do pliku")
-file_path = input().strip('"')
-file_path.split('"')
+    remove_crosssects(file_path)
 
-remove_crosssects(file_path)
+if __name__ == "__main__":
+    main()

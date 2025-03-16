@@ -28,10 +28,13 @@ def rename_file( files ):
             os.rename(file, newFilePath)
 
 
+def main():
+    print("Podaj ścieżkę: ")
+    current_path = input()
+    extension = ".xml"
 
-print("Podaj ścieżkę: ")
-current_path = input()
-extension = ".xml"
+    fitFiles = get_files(current_path, extension, recursive = True)
+    rename_file(fitFiles)
 
-fitFiles = get_files(current_path, extension, recursive = True)
-rename_file(fitFiles)
+if __name__ == "__main__":
+    main()
