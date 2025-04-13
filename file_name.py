@@ -1,14 +1,56 @@
 import os
 import pyperclip
 import itertools as it
-# import glob
+
 
 def scantree(path):
     for i in os.scandir(path):
         if i.is_file():
             yield i
 
+def sumAndListOfFileInDictionary(dicOfExtension):
+    sumOfFile = 0
+    listOfExtensionSum = []
+    listOfFiles = []
 
+    for extension, extensionFileList in dicOfExtension.items():
+        lenOfFilesWithExtension = len(extensionFileList)
+
+        sumOfFile += lenOfFilesWithExtension
+        listOfExtensionSum.append((extension, lenOfFilesWithExtension))
+
+        listOfFiles.extend(extensionFileList)
+
+        print(f"Pliki z rozszerzeniem '{extension}':")
+        for file in extensionFileList:
+            print(f"  {file}")
+
+    print('\nCałkowita ilość plików to: ', sumOfFile)
+    print('Lista plików z rozszerzeniem:')
+    for extension, count in listOfExtensionSum:
+        print(f"    {extension} = {count}")
+    pyperclip.copy('\n'.join(listOfFiles))
+
+
+
+def selectFiles(path, *extensions):
+    files = []
+    for file in scantree(path):
+        if not extensions or file.name.endswith(extensions):
+                files.append(file.name)
+    return files
+
+def groupByExtension(path, *extensions):
+    dicOfExtension = dict()
+
+    for file in scantree(path):
+        if not extensions or file.name.endswith(extensions):
+            extension = os.path.splitext(file.name)[1]
+            if extension not in dicOfExtension:
+                dicOfExtension[extension] = []
+            dicOfExtension[extension].append(file.name)
+           
+    return dicOfExtension
 
 
 def main():
@@ -17,32 +59,13 @@ def main():
     path = r"C:\OneDrive - 3D GEOSYSTEMY MICHAŁ JAŚKIEWICZ\Projekty iCON Office\LEWCZUK\LK 201\Korytarze\17.01.2025"
     print(path)
     extensionTrm = '.trm'
-    files = []
+    extensionL3d = '.l3d'
 
-    for i in scantree(path):
-        files.append(i.name)
 
-    files = sorted(files, key= lambda x: os.path.splitext(x))
+    dicOfExtension = groupByExtension(path, extensionTrm, extensionL3d)
+    sumAndListOfFileInDictionary(dicOfExtension)
 
-    sunOfFile = 0
-    dicOfExtension = dict()
-    for excentionOfFile, typeOfExtension in it.groupby(files,key= lambda x: os.path.splitext(x)[1]):
-        typeOfExtension = list(typeOfExtension)
-        sunOfFile+=len(typeOfExtension)
-        
-        if excentionOfFile in dicOfExtension:
-            dicOfExtension[excentionOfFile] += len(typeOfExtension)
-        else:
-            dicOfExtension[excentionOfFile] = len(typeOfExtension)
 
-    print('Całkowita ilość plików to: ', sunOfFile,'\n')
-
-    for file in files:
-        print('{}'.format(file))
-
-    for key, value in dicOfExtension.items():
-        print(f"{key} = {value}")
-    pyperclip.copy('\n'.join(files))
 
 if __name__ == "__main__":
     main()
