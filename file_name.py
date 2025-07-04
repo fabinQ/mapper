@@ -55,14 +55,16 @@ def groupByExtension(path, *extensions):
 
 def main():
 
-    # path = input("Podaj ścieżke mordo ")
-    path = r"C:\OneDrive - 3D GEOSYSTEMY MICHAŁ JAŚKIEWICZ\Projekty iCON Office\LEWCZUK\LK 201\Korytarze\17.01.2025"
+    path = input("Podaj ścieżke mordo ")
+    # path = r"C:\OneDrive - 3D GEOSYSTEMY MICHAŁ JAŚKIEWICZ\Projekty iCON Office\KB CONSTRUCTION\OSTRODA\PODFOLDERY\14.04.2025"
     print(path)
     extensionTrm = '.trm'
     extensionL3d = '.l3d'
+    extensionXML = '.xml'
+    extensionTxt = '.txt'
 
 
-    dicOfExtension = groupByExtension(path, extensionTrm, extensionL3d)
+    dicOfExtension = groupByExtension(path, extensionTrm, extensionL3d,extensionXML,extensionTxt)
     sumAndListOfFileInDictionary(dicOfExtension)
 
 
