@@ -1,3 +1,5 @@
+from urllib.parse import unquote
+
 import os.path
 
 def patch_creator( catalog, file):
@@ -21,7 +23,7 @@ def get_files(current_path, extension, recursive = False):
 def rename_file( files ):
     for file in files:
         catalog, fileName = os.path.split(file)
-        newFileName = fileName.replace("%", "")
+        newFileName = unquote(fileName)
         newFilePath = patch_creator(catalog, newFileName)
 
         if newFileName != fileName:
