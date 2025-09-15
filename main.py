@@ -1,9 +1,10 @@
-import file_name, renaming, XML_repair, table_scratch, coordinate_transformer_PL92_WGS84, compression_folders, coordinate_transformer_KR60
+# -*- coding: utf-8 -*-
+import file_name, renaming, XML_repair, table_scratch, coordinate_transformer_PL92_WGS84, compression_folders, coordinate_transformer_KR60, company_scraper
 
 def main():
     while (True):
         print("\nNarzędzie terminalowe, wybierz numer")
-        print(" 1. file_name\n", "2. renaming\n", "3. XML_repair\n", "4. table_scratch\n", "5. coordinate_transformer_PL92_WGS84\n", "6. compression_folders\n", "7. coordinate_transformer_KR60\n""exit\n")
+        print(" 1. file_name\n", "2. renaming\n", "3. XML_repair\n", "4. table_scratch\n", "5. coordinate_transformer_PL92_WGS84\n", "6. compression_folders\n", "7. coordinate_transformer_KR60\n", "8. company_scraper\n","exit\n")
         input_value = input()
 
         if input_value == "1" or input_value == "file_name" or input_value == "1. file_name":
@@ -20,6 +21,8 @@ def main():
             compression_folders.main()
         elif input_value == "7" or input_value == "coordinate_transformer_KR60" or input_value == "7. coordinate_transformer_KR60":
             coordinate_transformer_KR60.main()
+        elif input_value == "8" or input_value == "company_scraper" or input_value == "8. company_scraper":
+            company_scraper.main()
         elif input_value.lower() == "exit":
             break;
 
