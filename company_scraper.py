@@ -142,10 +142,10 @@ def main():
                 # time.sleep(1) # Przerwa
                 licznik += 1
 
-            # Zapis do pliku CSV
+            # Zapis do pliku CSV ze średnikiem jako separatorem
             try:
                 with open(PLIK_WYNIKOWY_CSV, 'w', newline='', encoding='utf-8-sig') as plik_csv:
-                    writer = csv.writer(plik_csv)
+                    writer = csv.writer(plik_csv, delimiter=';')
                     writer.writerow(['Nazwa Firmy', 'NIP', 'Telefon', 'Strona WWW', 'Email', 'Facebook', 'Link do profilu PF'])
                     writer.writerows(wszystkie_firmy)
                 print(f"\nUkończono! Zapisano dane {len(wszystkie_firmy)} firm do pliku '{PLIK_WYNIKOWY_CSV}'.")
